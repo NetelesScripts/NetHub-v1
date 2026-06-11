@@ -1,3 +1,616 @@
+repeat task.wait() until game:IsLoaded()
+
+-- Carga WindUI
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+task.wait(1)
+
+-- Ventana principal
+local Window = WindUI:CreateWindow({
+    Title = "Net Hub",
+    Icon = "door-open",
+    Author = "Juancito",
+    Folder = "NetHub",
+    Size = UDim2.fromOffset(580, 460),
+    Transparent = true,
+    Theme = "Dark",
+    Resizable = true,
+    SideBarWidth = 200,
+    HideSearchBar = true,
+    ScrollBarEnabled = false
+})
+
+-- ==================== TABS ====================
+local CombatTab = Window:Tab({
+    Title = "Combat",
+    Icon = "solar:sword-bold",
+    Desc = "Net Hub"
+})
+
+local WorldTab = Window:Tab({
+    Title = "World",
+    Icon = "solar:widget-add-bold",
+    Desc = "Net Hub"
+})
+
+local GodModeTab = Window:Tab({
+    Title = "God Mode",
+    Icon = "solar:shield-bold",
+    Desc = "Net Hub"
+})
+
+-- ==================== COMBAT TAB ====================
+CombatTab:Button({
+    Title = "🔫 Shoot Murderer",
+    Desc = "Crea o elimina el botón flotante para disparar al asesino.",
+    Callback = function()
+    -- PEGA TU SCRIPT AQUI (Shoot Murderer)
+local FloatingShootButton = nil
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+if FloatingShootButton and FloatingShootButton.Parent then
+    FloatingShootButton.Parent:Destroy()
+    FloatingShootButton = nil
+    print("❌ Botón flotante eliminado.")
+    return
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ShootMurdererUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 220, 0, 75)
+Button.Position = UDim2.new(0.5, -110, 0.12, 0)
+Button.BackgroundColor3 = Color3.fromRGB(20, 20, 35)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "🔫 Shoot Murderer"
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 22
+Button.Parent = ScreenGui
+
+Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", Button)
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(90, 120, 255)
+
+-- Hacerlo movible
+local dragging = false
+local dragStart, startPos
+Button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Button.Position
+    end
+end)
+Button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        Button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Acción al presionar el botón flotante
+Button.MouseButton1Click:Connect(function()
+    local Character = LocalPlayer.Character
+    local Backpack = LocalPlayer:FindFirstChild("Backpack")
+    if not Character or not Backpack then return end
+
+    local Gun = Backpack:FindFirstChild("Gun") or Character:FindFirstChild("Gun")
+    if not Gun then
+        print("⚠️ No tienes el arma equipada.")
+        return
+    end
+
+    local ShootRemote = Gun:FindFirstChildOfClass("RemoteEvent")
+    if not ShootRemote then
+        print("⚠️ No se encontró RemoteEvent de disparo.")
+        return
+    end
+
+    local MyRoot = Character:FindFirstChild("HumanoidRootPart")
+    if not MyRoot then return end
+
+    local Murderer
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character then
+            if plr.Backpack:FindFirstChild("Knife") or plr.Character:FindFirstChild("Knife") then
+                Murderer = plr
+                break
+            end
+        end
+    end
+
+    if not Murderer or not Murderer.Character then
+        print("😶 No se encontró asesino.")
+        return
+    end
+
+    local TargetRoot = Murderer.Character:FindFirstChild("HumanoidRootPart")
+    if not TargetRoot then return end
+
+    Gun.Parent = Character
+    task.defer(function()
+        local predicted = TargetRoot.CFrame + (TargetRoot.Velocity * 0.125)
+        ShootRemote:FireServer(MyRoot.CFrame, predicted)
+        task.wait(0.03)
+        Gun.Parent = Backpack
+    end)
+
+    print("✅ Disparo automático ejecutado contra:", Murderer.Name)
+end)
+
+FloatingShootButton = Button
+print("🎯 Botón flotante personalizado creado y movible.")
+
+    end
+})
+
+CombatTab:Button({
+    Title = "💀 Kill All",
+    Desc = "Crea o elimina el botón flotante para matar a todos los jugadores.",
+    Callback = function()
+    -- PEGA TU SCRIPT AQUI (Kill All)
+local FloatingKillButton = nil
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+if FloatingKillButton and FloatingKillButton.Parent then
+    FloatingKillButton.Parent:Destroy()
+    FloatingKillButton = nil
+    print("❌ Botón flotante eliminado.")
+    return
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KillAllUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 220, 0, 75)
+Button.Position = UDim2.new(0.5, -110, 0.25, 0)
+Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "💀 Kill All"
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 22
+Button.Parent = ScreenGui
+
+Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", Button)
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(255, 80, 80)
+
+-- Hacerlo movible
+local dragging = false
+local dragStart, startPos
+Button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Button.Position
+    end
+end)
+Button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        Button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Acción al presionar el botón flotante
+Button.MouseButton1Click:Connect(function()
+    local Character = LocalPlayer.Character
+    local Backpack = LocalPlayer:FindFirstChild("Backpack")
+    if not Character or not Backpack then return end
+
+    local Knife = Character:FindFirstChild("Knife") or Backpack:FindFirstChild("Knife")
+    if not Knife then
+        print("⚠️ No eres el asesino.")
+        return
+    end
+
+    local MyRoot = Character:FindFirstChild("HumanoidRootPart")
+    local Humanoid = Character:FindFirstChild("Humanoid")
+    if not (MyRoot and Humanoid) then return end
+
+    if Knife.Parent == Backpack then
+        Humanoid:EquipTool(Knife)
+        task.wait()
+    end
+
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local enemyRoot = plr.Character.HumanoidRootPart
+            enemyRoot.Anchored = true
+            enemyRoot.CFrame = MyRoot.CFrame * CFrame.new(0, 0, -2)
+        end
+    end
+
+    local stab = Knife:FindFirstChild("Stab")
+    if stab then stab:FireServer("Slash") end
+
+    task.wait(0.1)
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            plr.Character.HumanoidRootPart.Anchored = false
+        end
+    end
+
+    if Knife.Parent == Character then
+        Knife.Parent = Backpack
+    end
+
+    print("✅ Kill All ejecutado correctamente.")
+end)
+
+FloatingKillButton = Button
+print("🎯 Botón flotante personalizado creado y movible.")
+    end
+})
+
+-- ==================== WORLD TAB ====================
+WorldTab:Button({
+    Title = "👻 Invisible",
+    Desc = "Te hace invisible.",
+    Callback = function()
+    -- PEGA TU SCRIPT AQUI (Invisible)
+local FloatingInvisibleButton = nil
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+if FloatingInvisibleButton and FloatingInvisibleButton.Parent then
+    FloatingInvisibleButton.Parent:Destroy()
+    FloatingInvisibleButton = nil
+    print("❌ Botón flotante eliminado.")
+    return
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "InvisibleUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 220, 0, 75)
+Button.Position = UDim2.new(0.5, -110, 0.15, 0)
+Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "👻 Invisible"
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 22
+Button.Parent = ScreenGui
+
+Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", Button)
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(150, 150, 255)
+
+-- Hacerlo movible
+local dragging = false
+local dragStart, startPos
+Button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Button.Position
+    end
+end)
+Button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        Button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Acción al presionar el botón flotante
+Button.MouseButton1Click:Connect(function()
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    for _, part in ipairs(Character:GetDescendants()) do
+        if part:IsA("BasePart") or part:IsA("Decal") then
+            part.Transparency = part.Transparency == 0 and 1 or 0
+        end
+    end
+
+    print("👻 Invisibilidad alternada correctamente.")
+end)
+
+FloatingInvisibleButton = Button
+print("🎯 Botón flotante personalizado creado y movible.")
+
+    end
+})
+
+WorldTab:Button({
+    Title = "🏃 Run",
+    Desc = "Aumenta tu velocidad temporalmente.",
+    Callback = function()
+    -- PEGA TU SCRIPT AQUI (Run)
+local FloatingRunButton = nil
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+if FloatingRunButton and FloatingRunButton.Parent then
+    FloatingRunButton.Parent:Destroy()
+    FloatingRunButton = nil
+    print("❌ Botón flotante eliminado.")
+    return
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "RunUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 220, 0, 75)
+Button.Position = UDim2.new(0.5, -110, 0.25, 0)
+Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "🏃 Run"
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 22
+Button.Parent = ScreenGui
+
+Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", Button)
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(80, 255, 120)
+
+-- Hacerlo movible
+local dragging = false
+local dragStart, startPos
+Button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Button.Position
+    end
+end)
+Button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        Button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Acción al presionar el botón flotante
+Button.MouseButton1Click:Connect(function()
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+    if not Humanoid then return end
+
+    if Humanoid.WalkSpeed == 16 then
+        Humanoid.WalkSpeed = 50
+        print("🏃 Velocidad aumentada a 50.")
+    else
+        Humanoid.WalkSpeed = 16
+        print("🐢 Velocidad normal restaurada.")
+    end
+end)
+
+FloatingRunButton = Button
+print("🎯 Botón flotante personalizado creado y movible.")
+
+    end
+})
+
+WorldTab:Button({
+    Title = "🥷 Ninja Step",
+    Desc = "Activa el modo ninja.",
+    Callback = function()
+    -- PEGA TU SCRIPT AQUI (Ninja Step)
+local FloatingNinjaButton = nil
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+if FloatingNinjaButton and FloatingNinjaButton.Parent then
+    FloatingNinjaButton.Parent:Destroy()
+    FloatingNinjaButton = nil
+    print("❌ Botón flotante eliminado.")
+    return
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NinjaStepUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 220, 0, 75)
+Button.Position = UDim2.new(0.5, -110, 0.35, 0)
+Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "🥷 Ninja Step"
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 22
+Button.Parent = ScreenGui
+
+Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", Button)
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(255, 180, 80)
+
+-- Hacerlo movible
+local dragging = false
+local dragStart, startPos
+Button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Button.Position
+    end
+end)
+Button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        Button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Acción al presionar el botón flotante
+Button.MouseButton1Click:Connect(function()
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+    if not Humanoid then return end
+
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    if not Root then return end
+
+    -- Efecto ninja: salto rápido + velocidad temporal
+    Root.Velocity = Vector3.new(0, 100, 0)
+    Humanoid.WalkSpeed = 60
+    print("🥷 Activado modo Ninja Step.")
+
+    task.wait(2.5)
+    Humanoid.WalkSpeed = 16
+    print("🐢 Modo Ninja Step desactivado.")
+end)
+
+FloatingNinjaButton = Button
+print("🎯 Botón flotante personalizado creado y movible.")
+
+    end
+})
+
+WorldTab:Button({
+    Title = "🔫 Auto Grab Gun",
+    Desc = "Recoge automáticamente el arma caída.",
+    Callback = function()
+    -- PEGA TU SCRIPT AQUI (Auto Grab Gun)
+local FloatingGrabButton = nil
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+
+if FloatingGrabButton and FloatingGrabButton.Parent then
+    FloatingGrabButton.Parent:Destroy()
+    FloatingGrabButton = nil
+    print("❌ Botón flotante eliminado.")
+    return
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "AutoGrabGunUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 220, 0, 75)
+Button.Position = UDim2.new(0.5, -110, 0.45, 0)
+Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "🔫 Auto Grab Gun"
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 22
+Button.Parent = ScreenGui
+
+Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", Button)
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(255, 255, 120)
+
+-- Hacerlo movible
+local dragging = false
+local dragStart, startPos
+Button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Button.Position
+    end
+end)
+Button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        Button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Acción al presionar el botón flotante
+Button.MouseButton1Click:Connect(function()
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    local Root = Character:FindFirstChild("HumanoidRootPart")
+    if not Root then return end
+
+    local Gun = Workspace:FindFirstChild("GunDrop")
+    if not Gun then
+        print("😶 No hay arma caída en el mapa.")
+        return
+    end
+
+    print("🔍 Buscando arma caída...")
+
+    while Gun and Gun.Parent == Workspace do
+        local distance = (Root.Position - Gun.Position).Magnitude
+        if distance < 10 then
+            Root.CFrame = Gun.CFrame
+            print("✅ Arma recogida automáticamente.")
+            break
+        end
+        task.wait(0.2)
+    end
+end)
+
+FloatingGrabButton = Button
+print("🎯 Botón flotante personalizado creado y movible.")
+    end
+})
+
+-- ==================== GOD MODE TAB ====================
+GodModeTab:Button({
+    Title = "🛡️ God Mode",
+    Desc = "Activa modo invulnerable.",
+    Callback = function()
 -- PEGA TU SCRIPT AQUI (God Mode)
 local FloatingGodButton = nil
 
@@ -74,3 +687,6 @@ end)
 
 FloatingGodButton = Button
 print("🎯 Botón flotante personalizado creado y movible.")
+
+    end
+})
