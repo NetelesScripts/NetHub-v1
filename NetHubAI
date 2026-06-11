@@ -1,0 +1,76 @@
+-- PEGA TU SCRIPT AQUI (God Mode)
+local FloatingGodButton = nil
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+if FloatingGodButton and FloatingGodButton.Parent then
+    FloatingGodButton.Parent:Destroy()
+    FloatingGodButton = nil
+    print("❌ Botón flotante eliminado.")
+    return
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "GodModeUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Button = Instance.new("TextButton")
+Button.Size = UDim2.new(0, 220, 0, 75)
+Button.Position = UDim2.new(0.5, -110, 0.15, 0)
+Button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+Button.Text = "🛡️ God Mode"
+Button.Font = Enum.Font.GothamBold
+Button.TextSize = 22
+Button.Parent = ScreenGui
+
+Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 12)
+local stroke = Instance.new("UIStroke", Button)
+stroke.Thickness = 3
+stroke.Color = Color3.fromRGB(255, 215, 0)
+
+-- Hacerlo movible
+local dragging = false
+local dragStart, startPos
+Button.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Button.Position
+    end
+end)
+Button.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+        local delta = input.Position - dragStart
+        Button.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+-- Acción al presionar el botón flotante
+Button.MouseButton1Click:Connect(function()
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+    if not Humanoid then return end
+
+    if Humanoid.Health < math.huge then
+        Humanoid.Health = math.huge
+        Humanoid.MaxHealth = math.huge
+        print("🛡️ God Mode activado: salud infinita.")
+    else
+        Humanoid.Health = 100
+        Humanoid.MaxHealth = 100
+        print("💤 God Mode desactivado: salud normal restaurada.")
+    end
+end)
+
+FloatingGodButton = Button
+print("🎯 Botón flotante personalizado creado y movible.")
